@@ -16,12 +16,13 @@ public class ArvoreAVL {
 		}
 		
 		public Node getFilhoDir() {
-			this.fatorBalanceamento-=1;
+			
+			this.fatorBalanceamento-=1;				
 			return filhoDir;
 		}
 		
 		public Node getFilhoEsq() {
-			this.fatorBalanceamento+=1;
+			this.fatorBalanceamento+=1;				
 			return filhoEsq;
 		}
 		
@@ -50,20 +51,25 @@ public class ArvoreAVL {
 	}
 	
 	private void insercao(int valor, Node atual) {
-		if(atual.valor > valor && atual.getFilhoEsq() == null) {
+		
+		//TODO refazer a implementação {NÃO POSSO USAR RECURSIVIDADE EM CAUDA...}
+		
+		if(atual.valor > valor && atual.filhoEsq == null) {
 			atual.filhoEsq = new Node(valor);
 			return;
 		}
 		
-		else if(atual.valor < valor && atual.getFilhoDir() == null) {
+		else if(atual.valor < valor && atual.filhoDir == null) {
 			atual.filhoDir = new Node(valor);
 			return;
 		}
 		
-		insercao(valor,atual.valor > valor ? atual.filhoEsq : atual.filhoDir);
+		insercao(valor,atual.valor > valor ? atual.getFilhoEsq() : atual.getFilhoDir());
+		
 		
 		
 		if(atual != null && Math.abs(atual.fatorBalanceamento) > 1) {
+			System.out.println("Valor desbalanceado: "+atual.valor+"\nFB(v) =" + atual.fatorBalanceamento);
 			balancear(atual);
 		}
 	}
@@ -71,11 +77,27 @@ public class ArvoreAVL {
 	private void balancear(Node atual) {
 		System.out.println("Entrou...");
 		if(atual.fatorBalanceamento < 0) { //desbalanceado para A DIREITA
-			RotacaoEsquerda(atual);
+			
+			if(atual.filhoDir.fatorBalanceamento <= 0) {
+				rotacaoEsquerda(atual);
+				return;
+			}
+			
+			
+			rotacaoEsquerdaDupla(atual);
+		} else if(atual.fatorBalanceamento > 0) { //desbalanceado para A ESQUERDA
+			
+			if(atual.filhoEsq.fatorBalanceamento >= 0) {
+				rotacaoDireita(atual);				
+			}
+			
+			rotacaoDireitaDupla(atual);	
 		}
 	}
+	
 
-	private void RotacaoEsquerda(Node atual) {
+
+	private void rotacaoEsquerda(Node atual) {
 		Node aux = atual.filhoDir.filhoEsq;
 		atual.filhoDir.filhoEsq = atual;
 		this.raiz = atual.filhoDir;
@@ -83,7 +105,26 @@ public class ArvoreAVL {
 		
 		//TODO Organizar o fator de balanceamento...
 	}
+	
+	private void rotacaoEsquerdaDupla(Node atual) {
+		rotacaoDireita(atual);
+		rotacaoEsquerda(atual);
+	}
+	
+	private void rotacaoDireita(Node atual) {
+		Node aux = atual.filhoEsq.filhoDir;
+		atual.filhoEsq.filhoDir = atual;
+		this.raiz = atual.filhoEsq;
+		atual.filhoEsq = aux;
+		
+		//TODO Organizar o fator de balanceamento...
+	}
 
+	private void rotacaoDireitaDupla(Node atual) {
+		rotacaoEsquerda(atual);
+		rotacaoDireita(atual);		
+	}
+	
 	public Integer pesquisa(int valor) {
 		return pesquisa(valor, raiz);
 	}
@@ -152,11 +193,12 @@ public class ArvoreAVL {
 	}
 	
 	private void emOrdem(Node raiz) {
+		saida += raiz.valor+" ";
+		
 		if(raiz.filhoEsq != null) {
 			emOrdem(raiz.filhoEsq);
 		}
 		
-		saida += raiz.valor+" ";
 		
 		if(raiz.filhoDir != null) {
 			emOrdem(raiz.filhoDir);
