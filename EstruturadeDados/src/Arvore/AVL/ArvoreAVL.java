@@ -52,7 +52,7 @@ public class ArvoreAVL {
 	
 	private void insercao(int valor, Node atual) {
 		
-		//TODO refazer a implementação {NÃO POSSO USAR RECURSIVIDADE EM CAUDA...}
+		//TODO refazer a implementação {NÃO POSSO USAR RECURSIVIDADE DE CAUDA...}
 		
 		if(atual.valor > valor && atual.filhoEsq == null) {
 			atual.filhoEsq = new Node(valor);
