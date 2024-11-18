@@ -15,17 +15,6 @@ public class ArvoreAVL {
 			this.valor = valor;
 		}
 		
-		public Node getFilhoDir() {
-			
-			this.fatorBalanceamento-=1;				
-			return filhoDir;
-		}
-		
-		public Node getFilhoEsq() {
-			this.fatorBalanceamento+=1;				
-			return filhoEsq;
-		}
-		
 		public boolean isEsq() {
 			return filhoEsq != null;
 		}
@@ -74,7 +63,8 @@ public class ArvoreAVL {
 			atual.fatorBalanceamento-=1;
 			
 		} else if(atual.filhoEsq != null && atual.filhoEsq.fatorBalanceamento != 0) {
-			atual.fatorBalanceamento+=1;	
+			atual.fatorBalanceamento+=1;
+			
 		}
 		
 		if(Math.abs(atual.fatorBalanceamento) > 1) {
@@ -82,7 +72,8 @@ public class ArvoreAVL {
 			balancear(atual);
 		}
 	}
-
+	
+	//TODO Consertar para o desbalanceamento de outros nós(Funciona somente a raiz)
 	private void balancear(Node atual) {
 
 		if(atual.fatorBalanceamento < 0) {
@@ -106,52 +97,45 @@ public class ArvoreAVL {
 	
 	private void rotacaoEsquerda(Node atual) {
 		Node aux = atual.filhoDir.filhoEsq;
-		trocarFator(atual,atual.filhoDir.filhoEsq);
+		trocarFator(atual,atual.filhoDir);
 		atual.filhoDir.filhoEsq = atual;
-		
-		//Até o momento isso daqui ta funcionando
-		if(atual == raiz) {
-			this.raiz = atual.filhoDir;			
-		} else {
-			this.raiz.filhoDir = atual.filhoDir;
-		}
-		
+		this.raiz = atual.filhoDir;
 		atual.filhoDir = aux;
 	}
 	
 	private void rotacaoDireita(Node atual) {
+		
 		Node aux = atual.filhoEsq.filhoDir;
-		trocarFator(atual,atual.filhoEsq.filhoDir);
+		trocarFator(atual,atual.filhoEsq);
 		atual.filhoEsq.filhoDir = atual;
-		
-		//Até o momento isso daqui ta funcionando
-		if(atual == raiz) {
-			this.raiz = atual.filhoEsq;			
-			
-		} else {
-			this.raiz.filhoEsq = atual.filhoEsq;
-		}
-		
+		this.raiz = atual.filhoEsq;
 		atual.filhoEsq = aux;
-		
 	}
 	
-	private void trocarFator(Node troca, Node troca2) {
-		if(troca2 == null) {
-			troca.fatorBalanceamento = 0;
-			return;
+	//FIXME ta tudo errado kkkkk
+	private void trocarFator(Node atual, Node atualFilho) {
+		if(atual.isEsq() && atualFilho == atual.filhoDir) {
+			int aux =  atual.filhoEsq.fatorBalanceamento+1;
+			atual.fatorBalanceamento = aux;
+			atual.fatorBalanceamento += atualFilho.fatorBalanceamento;
+			atualFilho.fatorBalanceamento+=aux;
+			
+			
+		} else if(atual.isDir() && atualFilho == atual.filhoEsq) {
+			int aux = atual.filhoDir.fatorBalanceamento-1;
+			atual.fatorBalanceamento = aux;
+			atual.fatorBalanceamento += atualFilho.fatorBalanceamento;
+			atualFilho.fatorBalanceamento+=aux;
 		}
-		
-		troca.fatorBalanceamento = troca2.fatorBalanceamento;
 	}
 	
 	private void rotacaoEsquerdaDupla(Node atual) {
-		rotacaoDireita(atual);
+		rotacaoDireita(atual.filhoDir);
 		rotacaoEsquerda(atual);
 	}
 
 	private void rotacaoDireitaDupla(Node atual) {
-		rotacaoEsquerda(atual);
+		rotacaoEsquerda(atual.filhoEsq);
 		rotacaoDireita(atual);		
 	}
 	
@@ -223,12 +207,12 @@ public class ArvoreAVL {
 	}
 	
 	private void emOrdem(Node raiz) {
+		saida += raiz.valor+"\nFB(v) ="+raiz.fatorBalanceamento+"\n";
 		
 		if(raiz.filhoEsq != null) {
 			emOrdem(raiz.filhoEsq);
 		}
 		
-		saida += raiz.valor+" ";
 		
 		if(raiz.filhoDir != null) {
 			emOrdem(raiz.filhoDir);
